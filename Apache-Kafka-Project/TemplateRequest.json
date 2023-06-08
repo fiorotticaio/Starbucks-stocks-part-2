@@ -1,0 +1,30 @@
+{
+	"Meta Data": {
+		"1. Information": "Intraday (1min) open, high, low, close prices and volume",
+		"2. Symbol": "SBUX",
+		"3. Last Refreshed": "2023-04-28 19:57:00",
+		"4. Interval": "1min",
+		"5. Output Size": "Compact",
+		"6. Time Zone": "US/Eastern"
+	},
+  
+	"Time Series (1min)": {
+		"2023-04-28 19:57:00": {
+			"1. open": "114.4100",
+			"2. high": "114.4100",
+			"3. low": "114.4100",
+			"4. close": "114.4100",
+			"5. volume": "127"
+		},
+		
+    [...]
+
+		"2023-04-28 15:10:00": {
+			"1. open": "113.9650",
+			"2. high": "113.9950",
+			"3. low": "113.9650",
+			"4. close": "113.9900",
+			"5. volume": "7563"
+		}
+	}
+}
