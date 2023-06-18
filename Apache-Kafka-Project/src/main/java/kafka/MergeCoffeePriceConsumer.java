@@ -10,7 +10,6 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
@@ -22,8 +21,6 @@ public class MergeCoffeePriceConsumer {
     String topic = "coffee_price"; 
 
     /* Setting partitions on topic (one for api response value, and other for interaction on UI) */
-    int api_coffee_price = 0;
-    int web_coffee_price = 1;
     int real_coffee_price = 2;
   
     /* Setting consumer 1 properties */
@@ -40,8 +37,8 @@ public class MergeCoffeePriceConsumer {
     propConsumer.setProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "1000");
   
     /* Creating two consumers, one for each partition */  
-    KafkaConsumer<String, String> consumerApiCoffeePricePartition = new KafkaConsumer<>(propConsumer);
-    KafkaConsumer<String, String> consumerWebCoffeePricePartition = new KafkaConsumer<>(propConsumer);
+    KafkaConsumer<String, String> consumerApiCoffeePriceTopic = new KafkaConsumer<>(propConsumer);
+    KafkaConsumer<String, String> consumerWebCoffeePriceTopic = new KafkaConsumer<>(propConsumer);
 
     /* New producer that send a record in the last partition of the "coffee_price" topic */
     Properties propProducer = new Properties();
@@ -53,30 +50,30 @@ public class MergeCoffeePriceConsumer {
     KafkaProducer<String, String> producer = new KafkaProducer<>(propProducer);
 
     /* Assining the topic on the api consumer */
-    consumerApiCoffeePricePartition.subscribe(Collections.singletonList("api_coffee_price"));
+    consumerApiCoffeePriceTopic.subscribe(Collections.singletonList("api_coffee_price"));    
     
-    // /* Assining the web partition on the web consumer */
-    TopicPartition webPartition = new TopicPartition(topic, web_coffee_price);
-    consumerWebCoffeePricePartition.assign(Collections.singletonList(webPartition));
+    /* Assining the topic on the web consumer */
+    consumerWebCoffeePriceTopic.subscribe(Collections.singletonList("web_coffee_price"));
 
     String apiCoffePriceStr = "0.0";
     String webCoffePriceStr = "0.0";
-    int count=0;
+    int count = 0;
     
     while (true) {
-      /* Polling from api partition on topic, each second */
-      ConsumerRecords<String, String> records2 = consumerApiCoffeePricePartition.poll(Duration.ofMillis(2000));
+      /* Polling from api topic on topic, each second */
+      ConsumerRecords<String, String> records2 = consumerApiCoffeePriceTopic.poll(Duration.ofMillis(2000));
       for (ConsumerRecord<String, String> record : records2) {
-        /* Storing the value for api partition on string */
+        /* Storing the value for api topic on string */
         apiCoffePriceStr = record.value();
         System.out.println("apiCoffePriceStr: " + apiCoffePriceStr);
       }
 
-      // /* Polling from web partition on topic, each second */
-      ConsumerRecords<String, String> records1 = consumerWebCoffeePricePartition.poll(Duration.ofMillis(2000));
+      // /* Polling from web topic on topic, each second */
+      ConsumerRecords<String, String> records1 = consumerWebCoffeePriceTopic.poll(Duration.ofMillis(2000));
       for (ConsumerRecord<String, String> record : records1) {
-        /* Storing the value for web partition on string */
-        webCoffePriceStr = record.value();
+        /* Storing the value for web topic on string, if it is greater them 0 */
+        if (Double.parseDouble(record.value()) != 0) webCoffePriceStr = record.value();
+        System.out.println("webCoffePriceStr: " + webCoffePriceStr);
       }
 
       /* Merging both values */
