@@ -111,7 +111,6 @@ public class CoffeeStockConsumer {
 
     /* Send coffee price to a new topic, the api_coffee_price */
     apiCoffeePriceStream.to(destinationTopic, Produced.with(Serdes.String(), Serdes.String()));
-    //TODO: se descobrirem como mandar pra partição específica como era antes seria ideal
 
 
     /* Creating kafka stream */
