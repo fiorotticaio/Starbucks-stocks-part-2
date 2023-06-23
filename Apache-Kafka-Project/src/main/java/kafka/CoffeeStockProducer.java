@@ -61,7 +61,7 @@ public class CoffeeStockProducer {
         ex.printStackTrace();
       }
 
-      /* Sleep for 20 seconds, before getting new API call */
+      /* Sleep for 10 seconds, before getting new API call */
       Thread.sleep(10000); 
     }
   }
