@@ -18,8 +18,16 @@ public class App {
       adminClient.createTopics(Collections.singleton(coffeeStock)).all().get();
 
       // Create the 'coffee_price' topic
-      NewTopic coffeePrice = new NewTopic("coffee_price", 3, (short) 1);
+      NewTopic coffeePrice = new NewTopic("coffee_price", 1, (short) 1);
       adminClient.createTopics(Collections.singleton(coffeePrice)).all().get();
+
+      // Create the 'api_coffee_price' topic
+      NewTopic ApiCoffeePrice = new NewTopic("api_coffee_price", 1, (short) 1);
+      adminClient.createTopics(Collections.singleton(ApiCoffeePrice)).all().get();
+
+      // Create the 'web_coffee_price' topic
+      NewTopic WebCoffeePrice = new NewTopic("web_coffee_price", 1, (short) 1);
+      adminClient.createTopics(Collections.singleton(WebCoffeePrice)).all().get();
 
       // Create the 'coffee_sales' topic
       NewTopic coffeeSales = new NewTopic("coffee_sales", 1, (short) 1);

@@ -1,0 +1,16 @@
+[[1;34mINFO[m] Scanning for projects...
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m-----------------------------< [0;36mkafka:src[0;1m >------------------------------[m
+[[1;34mINFO[m] [1mBuilding src 1.0-SNAPSHOT[m
+[[1;34mINFO[m] [1m--------------------------------[ jar ]---------------------------------[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mexec-maven-plugin:3.1.0:java[m [1m(default-cli)[m @ [36msrc[0;1m ---[m
+Api Coffe Price: 4.109130056804824
+Api Coffe Price: 3.898339825051431
+Api Coffe Price: 4.200561969247588
+Api Coffe Price: 3.936226143429255
+Api Coffe Price: 3.7873048502041304
+Api Coffe Price: 4.116765152575135
+Api Coffe Price: 3.775599425111502
+Api Coffe Price: 3.7709110453662658
+Api Coffe Price: 4.036679439106065

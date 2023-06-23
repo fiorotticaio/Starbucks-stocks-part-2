@@ -24,10 +24,10 @@ async function setup() {
   consumer.subscribe({ topic: "coffee_price" });
 
   await consumer.run({
-    eachMessage: async ({ topic, partition, message }) => {
-      if (partition == 0) COFFEE_PRICE_0 = message.value?.toString();
-      if (partition == 1) COFFEE_PRICE_1 = message.value?.toString();
-      if (partition == 2) COFFEE_PRICE_2 = message.value?.toString();
+    eachMessage: async ({ topic, message }) => {
+      COFFEE_PRICE_0 = -1; // FIXME
+      COFFEE_PRICE_1 = -1; // FIXME
+      COFFEE_PRICE_2 = message.value?.toString();
     },
   });
 }

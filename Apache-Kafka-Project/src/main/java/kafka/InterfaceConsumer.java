@@ -39,8 +39,8 @@ public class InterfaceConsumer {
             
         /* Creating Ktream to recive the web price event */
         KStream<String, String> webPriceValuesStream = sourceStream
-            .mapValues(value -> {
-                System.out.println("Received message: " + value);
+            .mapValues((key, value) -> {
+                System.out.println("Received message - key: " + key + " value: " + value);
                 Double coffeeValue = Double.parseDouble(value); 
                 
                 System.out.println("COUNT: " + countCoffeeSales.incrementAndGet()); // Incrementing the counter
@@ -50,15 +50,18 @@ public class InterfaceConsumer {
                     coffeeValue *= 2;    
                     System.out.println("Aumentou o preco do cafeh: " + coffeeValue);
                     countCoffeeSales.set(0); // Resetting the counter
+                } 
+                return coffeeValue.toString();
+            });
 
-                    return coffeeValue.toString();
-                } else {
-                    return "0.0";
-                }
+        KStream<String, String> webPriceKeyValuesStream = webPriceValuesStream
+            .selectKey((key, value) -> {
+                String newKey = "cafe";
+                return newKey;
             });
 
         /* Sending the web price to the destination topic */
-        webPriceValuesStream.to(destinationTopic, Produced.with(Serdes.String(), Serdes.String()));
+        webPriceKeyValuesStream.to(destinationTopic, Produced.with(Serdes.String(), Serdes.String()));
 
 
         /* Creating kafka stream */

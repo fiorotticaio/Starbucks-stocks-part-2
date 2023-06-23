@@ -7,7 +7,7 @@
 - [ ] implementem o “evento composto” da etapa 1 usando Kafka Streams;
   - [x] Mudar coffe stock consumer para kstream
   - [x] Mudar interface consumer para kstream
-  - [ ] Mudar merge coffee price para kstream
+  - [x] Mudar merge coffee price para kstream
 - [ ] Definam aplicações/topologias Kafka Streams que permitam a detecção de outras 3 situações de interesse no sistema;
 - [ ] Usem operações Stateless e Statefull da DSL do Streams. Usem filtros, maps, joins, agregações, janelas temporais e/ou de eventos.
 - [ ] Usem criatividade para incluir outras funcionalidades interessantes!

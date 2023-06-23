@@ -53,7 +53,7 @@ public class CoffeeStockProducer {
       try {
         HttpResponse response = client.execute(request);
         String responseObject = EntityUtils.toString(response.getEntity());
-        ProducerRecord<String, String> record = new ProducerRecord<String, String>(topic, "id_"+i, responseObject);
+        ProducerRecord<String, String> record = new ProducerRecord<String, String>(topic, "cafe", responseObject);
         producer.send(record);
         System.out.println("Publishing API Raw on " + topic);
 
@@ -61,7 +61,7 @@ public class CoffeeStockProducer {
         ex.printStackTrace();
       }
 
-      /* Sleep for 20 seconds, before getting new API call */
+      /* Sleep for 10 seconds, before getting new API call */
       Thread.sleep(10000); 
     }
   }
