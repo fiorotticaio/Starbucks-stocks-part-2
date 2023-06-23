@@ -4,7 +4,7 @@
 - [x] Considerem um cliente (front-end) que permita visualização dos dados de forma amigável.
 
 ## Funcionalidades
-- [ ] implementem o “evento composto” da etapa 1 usando Kafka Streams;
+- [x] implementem o “evento composto” da etapa 1 usando Kafka Streams;
   - [x] Mudar coffe stock consumer para kstream
   - [x] Mudar interface consumer para kstream
   - [x] Mudar merge coffee price para kstream
