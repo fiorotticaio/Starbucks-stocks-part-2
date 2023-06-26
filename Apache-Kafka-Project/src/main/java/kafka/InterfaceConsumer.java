@@ -34,7 +34,7 @@ public class InterfaceConsumer {
         KStream<String, String> sourceStream = builder.stream(sourceTopic,
             Consumed.with(Serdes.String(), Serdes.String()));
 
-
+        // TODO: trocar pela operação statefull count e janelas temporais
         AtomicInteger countCoffeeSales = new AtomicInteger(0); // Initializing the counter
             
         /* Creating Ktream to recive the web price event */
