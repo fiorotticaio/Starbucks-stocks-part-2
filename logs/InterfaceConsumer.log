@@ -5,14 +5,53 @@
 [[1;34mINFO[m] [1m--------------------------------[ jar ]---------------------------------[m
 [[1;34mINFO[m] 
 [[1;34mINFO[m] [1m--- [0;32mexec-maven-plugin:3.1.0:java[m [1m(default-cli)[m @ [36msrc[0;1m ---[m
-Received message - key: null value: 4.200561969247588
+Received message - key: null value: 6.303345928884427
 COUNT: 1
-Received message - key: null value: 4.200561969247588
+Sending message - key: cafe value: 6.303345928884427
+Received message - key: null value: 9.455018893326642
 COUNT: 2
-Received message - key: null value: 4.200561969247588
+Sending message - key: cafe value: 9.455018893326642
+Received message - key: null value: 9.455018893326642
 COUNT: 3
-Received message - key: null value: 4.200561969247588
+Sending message - key: cafe value: 9.455018893326642
+Received message - key: null value: 9.455018893326642
 COUNT: 4
-Received message - key: null value: 4.200561969247588
+Sending message - key: cafe value: 9.455018893326642
+Received message - key: null value: 9.455018893326642
 COUNT: 5
-Aumentou o preco do cafeh: 8.401123938495177
+Aumentou o preco do cafeh: 18.910037786653284
+Sending message - key: cafe value: 18.910037786653284
+Received message - key: null value: 18.910037786653284
+COUNT: 1
+Sending message - key: cafe value: 18.910037786653284
+Received message - key: null value: 18.910037786653284
+COUNT: 2
+Sending message - key: cafe value: 18.910037786653284
+Received message - key: null value: 18.910037786653284
+COUNT: 3
+Sending message - key: cafe value: 18.910037786653284
+Received message - key: null value: 18.910037786653284
+COUNT: 4
+Sending message - key: cafe value: 18.910037786653284
+Received message - key: null value: 18.910037786653284
+COUNT: 5
+Aumentou o preco do cafeh: 37.82007557330657
+Sending message - key: cafe value: 37.82007557330657
+Received message - key: null value: 4.042441420760472
+COUNT: 1
+Sending message - key: cafe value: 4.042441420760472
+COUNT tabela: 1
+Received message - key: null value: 4.042441420760472
+COUNT: 2
+Sending message - key: cafe value: 4.042441420760472
+Received message - key: null value: 4.042441420760472
+COUNT: 3
+Sending message - key: cafe value: 4.042441420760472
+Received message - key: null value: 4.042441420760472
+COUNT: 4
+Sending message - key: cafe value: 4.042441420760472
+Received message - key: null value: 4.042441420760472
+COUNT: 5
+Aumentou o preco do cafeh: 8.084882841520944
+Sending message - key: cafe value: 8.084882841520944
+COUNT tabela: 1

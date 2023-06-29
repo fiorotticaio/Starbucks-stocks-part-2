@@ -5,10 +5,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
+import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.Consumed;
+import org.apache.kafka.streams.kstream.Grouped;
 import org.apache.kafka.streams.kstream.KStream;
+import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Produced;
 
 
@@ -54,14 +57,31 @@ public class InterfaceConsumer {
                 return coffeeValue.toString();
             });
 
+        /* Putting a key in the events */
         KStream<String, String> webPriceKeyValuesStream = webPriceValuesStream
             .selectKey((key, value) -> {
                 String newKey = "cafe";
                 return newKey;
             });
 
+
         /* Sending the web price to the destination topic */
-        webPriceKeyValuesStream.to(destinationTopic, Produced.with(Serdes.String(), Serdes.String()));
+        webPriceKeyValuesStream
+            .peek((key, value) -> System.out.println("Sending message - key: " + key + " value: " + value))
+            .to(destinationTopic, Produced.with(Serdes.String(), Serdes.String()));
+
+
+        /* Couting the number of registers in webPriceValuesStream */
+        KTable<String, String> webPriceKeyValuesTable = builder.table(destinationTopic,
+            Consumed.with(Serdes.String(), Serdes.String()));
+
+        KTable<String, Long> webPriceKeyValuesTableCount = webPriceKeyValuesTable
+            .groupBy((key, value) -> new KeyValue(key, key), Grouped.with(Serdes.String(), Serdes.String()))
+            .count();
+
+        webPriceKeyValuesTableCount.toStream()
+            .peek((key, value) -> System.out.println("COUNT tabela: " + value));
+
 
 
         /* Creating kafka stream */
