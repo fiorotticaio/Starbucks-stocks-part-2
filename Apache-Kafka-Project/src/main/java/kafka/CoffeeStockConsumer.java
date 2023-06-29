@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
@@ -40,7 +38,7 @@ public class CoffeeStockConsumer {
       Consumed.with(Serdes.String(), Serdes.String()));
 
 
-    /* Creating kStream to recive the close value */
+    /* Creating kStream to receive the close value */
     KStream<String, String> closedValuesStream = sourceStream
       .mapValues(value -> {
         String[] lines = value.split("\n", -1); // Split the message in a lot of lines
@@ -58,9 +56,8 @@ public class CoffeeStockConsumer {
 
         return sb.toString();
       });
-
-
-    /* Creating stream to recive the api coffee price */
+      
+    /* Creating stream to receive the api coffee price */
     KStream<String, String> apiCoffeePriceStream = closedValuesStream
       .flatMapValues(value -> {
         String[] numbers = value.split("\""); // Split the message in a lot of values

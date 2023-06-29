@@ -43,6 +43,9 @@ public class MergeCoffeePriceConsumer {
       Consumed.with(Serdes.String(), Serdes.String()));
 
 
+    // Duration joinWindowCooldown = Duration.ofSeconds(10);
+    // Duration gracePeriod = Duration.ofHours(24);
+
     /* left join of the two streams */
     KStream<String, String> joinedStream = apiCoffeePriceStream.leftJoin(webCoffeePriceStream,
       (apiPrice, webPrice) -> {
@@ -50,17 +53,20 @@ public class MergeCoffeePriceConsumer {
           if (Double.parseDouble(webPrice) != 0) {
             /* If there is a matching value in the right stream return the average of the two values */
             Double rtn = mergePrices(Double.parseDouble(apiPrice), Double.parseDouble(webPrice));
-            System.out.printf("Real coffee price [%s/%s]: %.2f\n", webPrice, apiPrice, rtn);
+            System.out.printf("Real coffee price [%s||%s]: %.2f\n", webPrice, apiPrice, rtn);
             return rtn.toString();
           } else {
             /* If there is no matching value in the right stream, return the value in the left stream */
             return apiPrice;
           }
         } else {
-          System.out.println("Caiu no else");
+          System.out.printf("Real coffee price [00||%s]: %.2f\n", apiPrice, Double.parseDouble(apiPrice));
           return apiPrice;
         }
       },
+
+      // This bit of code does a "wait" condition, in order to check if there's any response on the interface (buys)
+      // JoinWindows.ofTimeDifferenceAndGrace(joinWindowCooldown, gracePeriod),
       JoinWindows.of(Duration.ofSeconds(10)), // What determine whem the price will decrease, without interface buys
       StreamJoined.with(Serdes.String(), Serdes.String(), Serdes.String())
     );
