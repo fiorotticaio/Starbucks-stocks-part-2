@@ -10,18 +10,18 @@ import api from "@/services/api";
 
 export default function Home() {
 
-  const [ coffee_price_0, setcfp0 ] = useState<number>(0);
-  const [ coffee_price_1, setcfp1 ] = useState<number>(0);
-  const [ coffee_price_2, setcfp2 ] = useState<number>(0);
+  const [ coffee_price, setCoffePrice ] = useState<number>(0);
+  const [ web_coffee_price, setWebPrice ] = useState<number>(0);
+  const [ api_coffee_price, setApiPrice ] = useState<number>(0);
 
   async function fetchKafka() {
     const response = await api.get('/all')
     
     
     if (response.data) {
-      setcfp0(parseFloat(response.data.coffee_price_0))
-      setcfp1(parseFloat(response.data.coffee_price_1))
-      setcfp2(parseFloat(response.data.coffee_price_2))
+      setCoffePrice(parseFloat(response.data.coffee_price))
+      setWebPrice(parseFloat(response.data.web_coffee_price))
+      setApiPrice(parseFloat(response.data.api_coffee_price))
     }
   }
 
@@ -53,15 +53,15 @@ export default function Home() {
             <tbody>
               <tr>
                 <td>REAL STOCK API PRICE</td>
-                <td>{coffee_price_0?coffee_price_0.toFixed(2):0}</td>
+                <td>{api_coffee_price?api_coffee_price.toFixed(2):0}</td>
               </tr>
               <tr>
                 <td>USER INTERFACE PRICE</td>
-                <td>{coffee_price_1?coffee_price_1.toFixed(2):0}</td>
+                <td>{web_coffee_price?web_coffee_price.toFixed(2):0}</td>
               </tr>
               <tr>
                 <td>MERGED PRICE</td>
-                <td>{coffee_price_2?coffee_price_2.toFixed(2):0}</td>
+                <td>{coffee_price?coffee_price.toFixed(2):0}</td>
               </tr>
             </tbody>
           </table>
@@ -69,13 +69,13 @@ export default function Home() {
         <section className={styles.contentProducts}>
           <Product
             image={mediumCupImg}
-            price={coffee_price_2}
+            price={coffee_price}
             name="Medium Cup"
             size="250ml"
           />
           <Product
             image={largeCupImg}
-            price={coffee_price_2*1.5}
+            price={coffee_price*1.5}
             name="Large Cup"
             size="400ml"
           />
