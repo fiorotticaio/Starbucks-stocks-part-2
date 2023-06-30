@@ -1,99 +1,117 @@
 package kafka;
 
-import java.time.Duration;
+import java.util.Arrays;
 import java.util.Properties;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.time.Duration;
 
-import org.apache.kafka.common.serialization.Serde;
+import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
-import org.apache.kafka.streams.kstream.Consumed;
-import org.apache.kafka.streams.kstream.Grouped;
-import org.apache.kafka.streams.kstream.KGroupedStream;
-import org.apache.kafka.streams.kstream.KStream;
-import org.apache.kafka.streams.kstream.KTable;
-import org.apache.kafka.streams.kstream.KeyValueMapper;
-import org.apache.kafka.streams.kstream.Produced;
-import org.apache.kafka.streams.kstream.TimeWindows;
-import org.apache.kafka.streams.kstream.Windowed;
+import org.apache.kafka.streams.errors.StreamsUncaughtExceptionHandler;
+import org.apache.kafka.streams.kstream.*;
+import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 
 public class InterfaceConsumer {
     public static void main(String[] args) {
         
-        /* Kafka configuration */
-        String BootstrapServer = "localhost:9092"; 
-        String sourceTopic = "coffee_sales"; 
+        // Config variables and topics
+        String BootstrapServer = "localhost:9092";
+        String sourceTopic = "coffee_sales";
         String destinationTopic = "web_coffee_price";
+        int threshold = 5;
 
-        /* Creating kafka stream props */
-        Properties kStreamProps = new Properties();
-        kStreamProps.put(StreamsConfig.APPLICATION_ID_CONFIG, "coffee-price-interface-processor");
-        kStreamProps.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, BootstrapServer);
-
-
-        /* Creating stream builder */
+        // Kafka stream configs and builder initialization
+        Properties config = new Properties();
+        config.put(StreamsConfig.APPLICATION_ID_CONFIG, "coffee-price-counter");
+        config.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, BootstrapServer);
+        config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        config.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
+        config.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
+        config.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, 0);
         StreamsBuilder builder = new StreamsBuilder();
 
+        // Getting the topic where the interface purchases are sended
+        KStream<String, String> textLines = builder.stream(sourceTopic, Consumed.with(Serdes.String(), Serdes.String()));
 
-        // TODO: trocar pela operação statefull count e janelas temporais
-        // AtomicInteger countCoffeeSales = new AtomicInteger(0); // Initializing the counter
+        // Sanitizing the incoming data
+        KStream<String, String> inputStream = textLines
+            .filter((key, value) -> value.contains(","))
+            .selectKey((key, value) -> value.split(",")[0].toLowerCase().trim())
+            .mapValues(value -> value.split(",")[1].trim())
+            .filter((key, value) -> key.equals("price"))
+            .peek((key, value) -> System.out.println("[INPUT] KEY: " + key + " VALUE: " + value));
 
-        /* Creating kStream to recive the data from source topic */
-        // KStream<String, String> sourceStream = builder.stream(sourceTopic,
-        //     Consumed.with(Serdes.String(), Serdes.String()));
-
-
-        //FIXME: isso nao ta funcionando ............
-        KTable<String, String> coffeeSales = builder.table(sourceTopic);
-
-        // Group by key and count occurrences
-        KTable<String, Long> countTable = coffeeSales
-            .groupBy((key, value) -> new KeyValue<>(value, value))
+        // Counting amount of purchases
+        KTable<String, Long> grouped = inputStream
+            .groupByKey()
             .count();
-
-        // Process the count values
-        countTable
+    
+        // Mapping amount of purchases accoding to threshold and converting count to String
+        KStream<String, String> groupedStream = grouped
             .toStream()
-            .peek((key, value) -> System.out.println("Key:" + key +" Valor:"+ value))
-            .to(destinationTopic, Produced.with(Serdes.String(),Serdes.Long()));
+            .peek((key, value) -> System.out.println("[COUNT] KEY: " + key + " VALUE: " + value))
+            .mapValues(value->{
+                if (value%threshold==0) return value.toString();
+                else return "null";
+            });
+
+        // Joining streams of ammounts and streams with prices 
+        KStream<String, String> joinedStream = groupedStream.leftJoin(
+            inputStream,
+            (count, price) -> {
+                if (count.equals("null")) return "null";
+                else return price;
+            },
+            JoinWindows.of(Duration.ofSeconds(1)),
+            StreamJoined.with(Serdes.String(), Serdes.String(), Serdes.String())
+        );
+
+        // Output of prices to the destination topic (which will be merged in the futures)
+        joinedStream
+            .filter((key, value) -> { if (value!=null) return !value.contains("null"); else return false;})
+            .peek((key, value) -> System.out.println("[OUTPUT] KEY:" + key +" VALUE: "+ value))
+            .to(destinationTopic, Produced.with(Serdes.String(), Serdes.String()));
+
+        // TODO: Decay stream
+        // KStream<Windowed<String>,String> decayingStream = inputStream
+        //     .groupByKey()
+        //     .windowedBy(TimeWindows.of(Duration.ofSeconds(10)))
+        //     .count()
+        //     .filter((windowedKey, count) -> count == 0)
+        //     .mapValues((windowedKey, count) -> "0.9")
+        //     .toStream();
         
-            
-        /* Creating Ktream to recive the web price event */
-        // KStream<String, String> webPriceValuesStream = sourceStream
-        //     .mapValues((key, value) -> {
-        //         System.out.println("Received message - key: " + key + " value: " + value);
-        //         // Double coffeeValue = Double.parseDouble(value); 
-                
-        //         // System.out.println("COUNT: " + countCoffeeSales.incrementAndGet()); // Incrementing the counter
+        // KStream<String, String> transformedStream = decayingStream
+        //     .map((windowedKey, value) -> new KeyValue<>(windowedKey.key(), value));
         
-        //         // /* If sales surpass some threshold, the overall price of coffee rises */
-        //         // if (countCoffeeSales.get() >= 5) { 
-        //         //     coffeeValue *= 1.5;    
-        //         //     System.out.println("Aumentou o preco do cafeh: " + coffeeValue);
-        //         //     countCoffeeSales.set(0); // Resetting the counter
-        //         //     return coffeeValue.toString();  
-        //         // } else return "0";
+        // KStream<String, String> resultStream = joinedStream.leftJoin(
+        //     transformedStream,
+        //     (price, decay) -> {if (decay!=null) return Long.parseLong(decay) * Long.parseLong(price);},
+        //     JoinWindows.of(Duration.ofSeconds(1)),
+        //     StreamJoined.with(Serdes.String(), Serdes.String(), Serdes.String()));
+        
+        // resultStream.to(destinationTopic, Produced.with(Serdes.String(), Serdes.String()));
+        
+        
+        // Final configuration            
+        KafkaStreams streams = new KafkaStreams(builder.build(), config);
+        streams.setUncaughtExceptionHandler(ex -> {
+            System.out.println("Kafka-Streams uncaught exception occurred. Stream will be replaced with new thread"+ ex);
+            return StreamsUncaughtExceptionHandler.StreamThreadExceptionResponse.REPLACE_THREAD;
+        });
 
-        //         return "0";
-
-        //     });
-
-        // KStream<String, String> webPriceKeyValuesStream = webPriceValuesStream
-        //     .selectKey((key, value) -> {
-        //         String newKey = "cafe";
-        //         return newKey;
-        //     });
-
-        // /* Sending the web price to the destination topic */
-        // webPriceKeyValuesStream.to(destinationTopic, Produced.with(Serdes.String(), Serdes.String()));
-
-
-        /* Creating kafka stream */
-        KafkaStreams streams = new KafkaStreams(builder.build(), kStreamProps);
         streams.start();
-    } 
+    }
 }

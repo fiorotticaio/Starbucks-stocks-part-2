@@ -53,7 +53,7 @@ public class CoffeeStockProducer {
       try {
         HttpResponse response = client.execute(request);
         String responseObject = EntityUtils.toString(response.getEntity());
-        ProducerRecord<String, String> record = new ProducerRecord<String, String>(topic, "cafe", responseObject);
+        ProducerRecord<String, String> record = new ProducerRecord<String, String>(topic, "price", responseObject);
         producer.send(record);
         System.out.println("Publishing API Raw on " + topic);
 
