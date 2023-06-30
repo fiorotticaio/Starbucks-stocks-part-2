@@ -42,6 +42,13 @@ public class MergeCoffeePriceConsumer {
     KStream<String, String> webCoffeePriceStream = builder.stream(sourceTopic2,
       Consumed.with(Serdes.String(), Serdes.String()));
 
+    apiCoffeePriceStream
+      .peek((key, value) -> System.out.println("[API] KEY:" + key +" VALUE: "+ value));
+
+    webCoffeePriceStream
+      // .mapValues(value -> value.split(",")[1].trim())
+      .peek((key, value) -> System.out.println("[WEB] KEY:" + key +" VALUE: "+ value));
+
 
     // Duration joinWindowCooldown = Duration.ofSeconds(10);
     // Duration gracePeriod = Duration.ofHours(24);
@@ -65,9 +72,7 @@ public class MergeCoffeePriceConsumer {
         }
       },
 
-      // This bit of code does a "wait" condition, in order to check if there's any response on the interface (buys)
-      // JoinWindows.ofTimeDifferenceAndGrace(joinWindowCooldown, gracePeriod),
-      JoinWindows.of(Duration.ofSeconds(10)), // What determine whem the price will decrease, without interface buys
+      JoinWindows.of(Duration.ofSeconds(10)),
       StreamJoined.with(Serdes.String(), Serdes.String(), Serdes.String())
     );
 
