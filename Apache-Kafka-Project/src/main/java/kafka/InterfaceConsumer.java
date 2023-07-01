@@ -72,7 +72,11 @@ public class InterfaceConsumer {
             inputStream,
             (count, price) -> {
                 if (count.equals("null")) return "null";
-                else return price;
+                // Add a 50% increase to every purchase
+                else {
+                    Double newValue = Double.parseDouble(price) * 1.5;
+                    return newValue.toString();
+                }
             },
             JoinWindows.of(Duration.ofSeconds(1)),
             StreamJoined.with(Serdes.String(), Serdes.String(), Serdes.String())

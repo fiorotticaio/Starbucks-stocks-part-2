@@ -50,9 +50,6 @@ public class MergeCoffeePriceConsumer {
       .peek((key, value) -> System.out.println("[WEB] KEY:" + key +" VALUE: "+ value));
 
 
-    // Duration joinWindowCooldown = Duration.ofSeconds(10);
-    // Duration gracePeriod = Duration.ofHours(24);
-
     /* left join of the two streams */
     KStream<String, String> joinedStream = apiCoffeePriceStream.leftJoin(webCoffeePriceStream,
       (apiPrice, webPrice) -> {

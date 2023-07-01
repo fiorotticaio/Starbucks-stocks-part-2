@@ -3,3 +3,4 @@ Starbucks-stock-frontend/node_modules/
 Starbucks-stock-backend/node_modules/
 data
 logs
+*/**/.next
