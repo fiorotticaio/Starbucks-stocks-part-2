@@ -1,8 +1,6 @@
 package kafka;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 import java.time.Duration;
 
@@ -30,14 +28,13 @@ public class InterfaceConsumer {
         
         // Config variables and topics
         String BootstrapServer = "localhost:9092";
-        String sourceTopic = "coffee_sales";
-        String destinationTopic = "web_coffee_price";
+        String sourceTopic = "cake_sales";
+        String destinationTopic = "web_cake_price";
         int threshold = 5;
-        Map<String, Long> purchaseHistory = new HashMap<>();
 
         // Kafka stream configs and builder initialization
         Properties config = new Properties();
-        config.put(StreamsConfig.APPLICATION_ID_CONFIG, "coffee-price-counter");
+        config.put(StreamsConfig.APPLICATION_ID_CONFIG, "cake-price-counter");
         config.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, BootstrapServer);
         config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         config.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
@@ -56,13 +53,10 @@ public class InterfaceConsumer {
             .filter((key, value) -> key.equals("price"))
             .peek((key, value) -> System.out.println("[INPUT] KEY: " + key + " VALUE: " + value));
 
-            
         // Counting amount of purchases
         KTable<String, Long> grouped = inputStream
             .groupByKey()
             .count();
-
-        grouped.toStream().foreach((key, value) -> purchaseHistory.put(key, value));
     
         // Mapping amount of purchases accoding to threshold and converting count to String
         KStream<String, String> groupedStream = grouped
@@ -72,7 +66,6 @@ public class InterfaceConsumer {
                 if (value%threshold==0) return value.toString();
                 else return "null";
             })
-            .peek((key, value) -> displayPurchaseHistory(purchaseHistory));
 
         // Joining streams of ammounts and streams with prices 
         KStream<String, String> joinedStream = groupedStream.leftJoin(
@@ -120,13 +113,5 @@ public class InterfaceConsumer {
         });
 
         streams.start();
-    }
-    
-    private static void displayPurchaseHistory(Map<String, Long> purchaseHistory) {
-        System.out.println("---- Histórico de Compras ----");
-        for (Map.Entry<String, Long> entry : purchaseHistory.entrySet()) {
-            System.out.println(entry.getKey() + ": " + entry.getValue() + " cafés comprados.");
-        }
-        System.out.println("-----------------------------");
     }
 }

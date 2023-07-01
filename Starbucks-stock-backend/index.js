@@ -9,7 +9,7 @@ app.use(cors())
 
 const kafka = new Kafka({
   clientId: "my-consumer",
-  brokers: [`${process.env.KAFKA_HOST}:${process.env.KAFKA_PORT}`],
+  brokers: [`localhost:9092`],
 });
 
 let COFFEE_PRICE = 0
