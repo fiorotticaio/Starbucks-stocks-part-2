@@ -10,15 +10,18 @@ interface ProductProps {
   size: string;
   image: StaticImageData;
   price: number;
+  productKey: string;
 }
 
-export default function Product({ name, size, image, price }: ProductProps) {
+export default function Product({ name, size, image, price, productKey }: ProductProps) {
 
   const [ buttonClicked, setButtonClicked ] = useState<boolean>(false);
   
   async function handleClick() {
     setButtonClicked(true)
-    await api.get(`/buy/${price.toString()}`)
+    //await api.get(`/buy/${price.toString()}`)
+    //include key in the url
+    await api.get(`/buy/${price.toString()}/${productKey}`)
     setTimeout(()=>setButtonClicked(false),50)
   }
 

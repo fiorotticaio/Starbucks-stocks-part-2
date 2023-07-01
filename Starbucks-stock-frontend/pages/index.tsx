@@ -2,20 +2,30 @@ import styles from "@/styles/pages/Home.module.css";
 
 import Header from "@/components/Header";
 import Product from "@/components/Product";
+import Graph from "@/components/Graph";
 
 import mediumCupImg from "@/public/mediumCup.png";
 import largeCupImg from "@/public/largeCup.png";
 import { useEffect, useState } from "react";
 import api from "@/services/api";
 
+interface HistoricProps {
+  id: string;
+  value: string;
+}
+
 export default function Home() {
 
   const [ coffee_price, setCoffePrice ] = useState<number>(0);
   const [ web_coffee_price, setWebPrice ] = useState<number>(0);
   const [ api_coffee_price, setApiPrice ] = useState<number>(0);
+  const [ amount, setAmount ] = useState<number[]>([]);
+  const [ date, setDate ] = useState<Date[]>([]);
+
 
   async function fetchKafka() {
     const response = await api.get('/all')
+    const history = await api.get('/historic')
     
     
     if (response.data) {
@@ -23,6 +33,30 @@ export default function Home() {
       setWebPrice(parseFloat(response.data.web_coffee_price))
       setApiPrice(parseFloat(response.data.api_coffee_price))
     }
+    if (history.data) {
+      const historic = history.data.historic as HistoricProps[]
+      console.log(historic)
+      const amount = historic.map((item, index)=>{
+        const a = parseFloat(item.value.split(' ')[1])
+        console.log(a)
+        return a
+      })
+      const date = historic.map((item, index)=>{
+        console.log(item.value.split(' ')[3])
+        const date = new Date(item.value.split(' ')[3])
+        const formattedDate = new Intl.DateTimeFormat("pt-BR", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        }).format(date);
+        return date
+      })
+      setAmount(amount)
+      setDate(date)
+    };
   }
 
   useEffect(()=>{
@@ -72,13 +106,18 @@ export default function Home() {
             price={coffee_price}
             name="Medium Cup"
             size="250ml"
+            productKey="sm_coffee"
           />
           <Product
             image={largeCupImg}
             price={coffee_price*1.5}
             name="Large Cup"
             size="400ml"
+            productKey="lg_coffee"
           />
+        </section>
+        <section className={styles.contentGraph}>
+          {/* <Graph dataX={historic} /> */}
         </section>
       </div>
       <div style={{marginTop: "10vh", marginBottom: "-50vh"}} className={styles.banner} />
