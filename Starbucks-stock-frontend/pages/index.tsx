@@ -8,6 +8,7 @@ import mediumCupImg from "@/public/mediumCup.png";
 import largeCupImg from "@/public/largeCup.png";
 import { useEffect, useState } from "react";
 import api from "@/services/api";
+import HistoryTable from "@/components/HistoryTable";
 
 interface HistoricProps {
   id: string;
@@ -19,8 +20,12 @@ export default function Home() {
   const [ coffee_price, setCoffePrice ] = useState<number>(0);
   const [ web_coffee_price, setWebPrice ] = useState<number>(0);
   const [ api_coffee_price, setApiPrice ] = useState<number>(0);
+  const [ coffee_price_history, setCoffeePriceHistory ] = useState<number[]>([]);
+  const [ web_coffee_price_history, setWebPriceHistory ] = useState<number[]>([]);
+  const [ api_coffee_price_history, setApiPriceHistory ] = useState<number[]>([]);
   const [ amount, setAmount ] = useState<number[]>([]);
   const [ date, setDate ] = useState<Date[]>([]);
+  const [ id, setId ] = useState<string[]>([]);
 
 
   async function fetchKafka() {
@@ -32,17 +37,20 @@ export default function Home() {
       setCoffePrice(parseFloat(response.data.coffee_price))
       setWebPrice(parseFloat(response.data.web_coffee_price))
       setApiPrice(parseFloat(response.data.api_coffee_price))
+      setCoffeePriceHistory([...coffee_price_history, parseFloat(response.data.coffee_price)])
+      setWebPriceHistory([...web_coffee_price_history, parseFloat(response.data.web_coffee_price)])
+      setApiPriceHistory([...api_coffee_price_history, parseFloat(response.data.api_coffee_price)])
     }
     if (history.data) {
       const historic = history.data.historic as HistoricProps[]
-      console.log(historic)
+      const id = historic.map((item, index)=>item.id)
+      setId(id)
+
       const amount = historic.map((item, index)=>{
         const a = parseFloat(item.value.split(' ')[1])
-        console.log(a)
         return a
       })
       const date = historic.map((item, index)=>{
-        console.log(item.value.split(' ')[3])
         const date = new Date(item.value.split(' ')[3])
         const formattedDate = new Intl.DateTimeFormat("pt-BR", {
           year: "numeric",
@@ -116,8 +124,12 @@ export default function Home() {
             productKey="lg_coffee"
           />
         </section>
+        <section className={styles.contentHistory}>
+          <HistoryTable amount={amount} date={date} id={id}/>
+        </section>
         <section className={styles.contentGraph}>
-          {/* <Graph dataX={historic} /> */}
+          <h1>A</h1>
+          <Graph api_price={api_coffee_price_history} web_price={web_coffee_price_history} merged_price={coffee_price_history} /> 
         </section>
       </div>
       <div style={{marginTop: "10vh", marginBottom: "-50vh"}} className={styles.banner} />

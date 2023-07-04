@@ -1,0 +1,13 @@
+.historyTable{
+    border-collapse: collapse;
+    border: 1px solid #ddd;
+    font-size: 18px;
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    /* height: 400px;
+    overflow-y: scroll; */
+}
+.historyTable th, .historyTable td{
+    padding: 4px;
+}
