@@ -2,7 +2,7 @@ import styles from "@/styles/pages/Home.module.css";
 
 import Header from "@/components/Header";
 import Product from "@/components/Product";
-import Graph from "@/components/Graph";
+//import Graph from "@/components/Graph";
 
 import mediumCupImg from "@/public/mediumCup.png";
 import largeCupImg from "@/public/largeCup.png";
@@ -123,13 +123,13 @@ export default function Home() {
             size="400ml"
             productKey="lg_coffee"
           />
-        </section>
-        <section className={styles.contentHistory}>
-          <HistoryTable amount={amount} date={date} id={id}/>
+          <section className={styles.contentHistory}>
+            <HistoryTable amount={amount} date={date} id={id}/>
+          </section>
         </section>
         <section className={styles.contentGraph}>
           <h1>A</h1>
-          <Graph api_price={api_coffee_price_history} web_price={web_coffee_price_history} merged_price={coffee_price_history} /> 
+          {/* <Graph api_price={api_coffee_price_history} web_price={web_coffee_price_history} merged_price={coffee_price_history} />  */}
         </section>
       </div>
       <div style={{marginTop: "10vh", marginBottom: "-50vh"}} className={styles.banner} />
