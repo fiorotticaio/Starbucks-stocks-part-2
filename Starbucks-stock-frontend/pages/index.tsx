@@ -2,13 +2,18 @@ import styles from "@/styles/pages/Home.module.css";
 
 import Header from "@/components/Header";
 import Product from "@/components/Product";
-//import Graph from "@/components/Graph";
+
+// import Graph from "@/components/Graph";
+// import dynamic from 'next/dynamic'
+// const Graph = dynamic(() => import("@/components/Graph"))
+import Graph, { sendToGraph } from "@/components/Graph"
 
 import mediumCupImg from "@/public/mediumCup.png";
 import largeCupImg from "@/public/largeCup.png";
 import { useEffect, useState } from "react";
 import api from "@/services/api";
 import HistoryTable from "@/components/HistoryTable";
+import Head from "next/head";
 
 interface HistoricProps {
   id: string;
@@ -26,12 +31,10 @@ export default function Home() {
   const [ amount, setAmount ] = useState<number[]>([]);
   const [ date, setDate ] = useState<Date[]>([]);
   const [ id, setId ] = useState<string[]>([]);
-
-
+  
   async function fetchKafka() {
     const response = await api.get('/all')
     const history = await api.get('/historic')
-    
     
     if (response.data) {
       setCoffePrice(parseFloat(response.data.coffee_price))
@@ -40,7 +43,9 @@ export default function Home() {
       setCoffeePriceHistory([...coffee_price_history, parseFloat(response.data.coffee_price)])
       setWebPriceHistory([...web_coffee_price_history, parseFloat(response.data.web_coffee_price)])
       setApiPriceHistory([...api_coffee_price_history, parseFloat(response.data.api_coffee_price)])
+      sendToGraph(response.data.api_coffee_price, response.data.web_coffee_price, response.data.coffee_price)
     }
+
     if (history.data) {
       const historic = history.data.historic as HistoricProps[]
       const id = historic.map((item, index)=>item.id)
@@ -73,6 +78,9 @@ export default function Home() {
 
   return (
     <div className={styles.home}>
+      <Head>
+        <title>Starbucks Kafka</title>
+      </Head>
       <Header />
       <div className={styles.banner} />
       <div className={styles.content}>
@@ -128,8 +136,7 @@ export default function Home() {
           </section>
         </section>
         <section className={styles.contentGraph}>
-          <h1>A</h1>
-          {/* <Graph api_price={api_coffee_price_history} web_price={web_coffee_price_history} merged_price={coffee_price_history} />  */}
+          <Graph />
         </section>
       </div>
       <div style={{marginTop: "10vh", marginBottom: "-50vh"}} className={styles.banner} />

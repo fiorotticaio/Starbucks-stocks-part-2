@@ -69,8 +69,6 @@ public class InterfaceConsumer {
             .count();
 
         // Saving purchase history
-
-            
         KStream<String, Purchases> purchaseStream = grouped
             .toStream()
             .mapValues((key, value) -> {
@@ -94,12 +92,16 @@ public class InterfaceConsumer {
                 else return "null";
             });
             
-            // Joining streams of ammounts and streams with prices 
+        // Joining streams of ammounts and streams with prices 
         KStream<String, String> joinedStream = groupedStream.leftJoin(
             textLines,
             (count, price) -> {
                 if (count.equals("null")) return "null";
-                else return price;
+                else {
+                    if (price==null) return price;
+                    Double newValue = Double.parseDouble(price)*1.1;
+                    return newValue.toString();
+                }
             },
             JoinWindows.of(Duration.ofSeconds(1)),
             StreamJoined.with(Serdes.String(), Serdes.String(), Serdes.String())
@@ -107,35 +109,14 @@ public class InterfaceConsumer {
         
         
             
-            // Output of prices to the destination topic (which will be merged in the futures)
+        // Output of prices to the destination topic (which will be merged in the futures)
         joinedStream
             .filter((key, value) -> { if (value!=null) return !value.contains("null"); else return false;})
             .selectKey((key, value) -> "price")     // para fazer o join, o kafka precisa que as chaves sejam iguais. A key do APIstream é "price". Isso significa que comprar um café grande resulta num aumento geral dos preços, assim como antes.
             .peek((key, value) -> System.out.println("[OUTPUT] KEY:" + key +" VALUE: "+ value))
             .to(destinationTopic, Produced.with(Serdes.String(), Serdes.String()));
-            /*
 
-        // TODO: Decay stream
-        // KStream<Windowed<String>,String> decayingStream = inputStream
-        //     .groupByKey()
-        //     .windowedBy(TimeWindows.of(Duration.ofSeconds(10)))
-        //     .count()
-        //     .filter((windowedKey, count) -> count == 0)
-        //     .mapValues((windowedKey, count) -> "0.9")
-        //     .toStream();
-        
-        // KStream<String, String> transformedStream = decayingStream
-        //     .map((windowedKey, value) -> new KeyValue<>(windowedKey.key(), value));
-        
-        // KStream<String, String> resultStream = joinedStream.leftJoin(
-        //     transformedStream,
-        //     (price, decay) -> {if (decay!=null) return Long.parseLong(decay) * Long.parseLong(price);},
-        //     JoinWindows.of(Duration.ofSeconds(1)),
-        //     StreamJoined.with(Serdes.String(), Serdes.String(), Serdes.String()));
-        
-        // resultStream.to(destinationTopic, Produced.with(Serdes.String(), Serdes.String()));
-        */
-        
+            
         // Final configuration            
         KafkaStreams streams = new KafkaStreams(builder.build(), config);
         streams.setUncaughtExceptionHandler(ex -> {

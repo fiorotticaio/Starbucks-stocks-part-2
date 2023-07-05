@@ -1,84 +1,71 @@
-import CanvasJSReact from '@canvasjs/react-charts';
 import React from 'react';
-//var CanvasJSReact = require('@canvasjs/react-charts');
+import { Line } from 'react-chartjs-2';
+import { LineElement, Chart, CategoryScale, LinearScale, PointElement, Legend } from "chart.js";
+Chart.register(LineElement);
+Chart.register(CategoryScale);
+Chart.register(LinearScale);
+Chart.register(PointElement);
+Chart.register(Legend)
 
-var CanvasJS = CanvasJSReact.CanvasJS;
-var CanvasJSChart = CanvasJSReact.CanvasJSChart;
+var dataAPI = [4]
+var dataWEB = [4]
+var dataMER = [4]
+var labels = [""]
 
-interface GraphProps {
-    web_price : number[],
-    api_price : number[],
-    merged_price : number[],
+const THRESHOLD = 15
+
+export const sendToGraph = (api: number, web: number, merged: number) => {
+  
+  if (dataAPI.length>=THRESHOLD) dataAPI.splice(0, 1)
+  else labels.push("")
+
+  if (dataWEB.length>=THRESHOLD) dataWEB.splice(0, 1)
+  if (dataMER.length>=THRESHOLD) dataMER.splice(0, 1)
+  
+  dataAPI.push(api)
+  dataWEB.push(web)
+  dataMER.push(merged)
 }
 
-
-export default function Graph({web_price, api_price, merged_price}:GraphProps) {
-    let web_price_dataPoints = web_price.map((item, index)=>{
-        return {x: index, y: item}
-    })
-    let api_price_dataPoints = api_price.map((item, index)=>{
-        return {x: index, y: item}
-    })
-    let merged_price_dataPoints = merged_price.map((item, index)=>{
-        return {x: index, y: item}
-    })
-    let chart = new CanvasJS.Chart("chartContainer", {
-        zoomEnabled: true,
-        title: {
-            text: "Stock Price of Starbucks"
-        },
-        axisX: {
-            title: "chart updates every sec"
-        },
-        axisY:{
-            prefix: "$"
-        }, 
-        toolTip: {
-            shared: true
-        },
-        legend: {
-            cursor:"pointer",
-            verticalAlign: "top",
-            fontSize: 22,
-            fontColor: "dimGrey",
-            itemclick : toggleDataSeries
-        },
-        data: [
-            { 
-                type: "line",
-                xValueType: "dateTime",
-                yValueFormatString: "$####.00",
-                xValueFormatString: "hh:mm:ss TT",
-                showInLegend: true,
-                name: "API price",
-                dataPoints: api_price_dataPoints
-            },
-            {				
-                type: "line",
-                xValueType: "dateTime",
-                yValueFormatString: "$####.00",
-                showInLegend: true,
-                name: "Inteface price",
-                dataPoints: api_price_dataPoints
-            },
-            {
-                type: "line",
-                xValueType: "dateTime",
-                yValueFormatString: "$####.00",
-                showInLegend: true,
-                name: "Merged price",
-                dataPoints: merged_price_dataPoints
-            }
-        ]
-    });
-    function toggleDataSeries(e: any) {
-        if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
-            e.dataSeries.visible = false;
-        }
-        else {
-            e.dataSeries.visible = true;
-        }
-        chart.render();
-    }
-
+const updateState = () => {
+  return {
+    labels,
+    datasets: [
+      { label: 'MERGED Price', data: dataMER, borderColor: "#3ee7a1" },
+      { label: 'API Price', data: dataAPI, borderColor: "#007042" },
+      { label: 'WEB Price', data: dataWEB, borderColor: "#04462b" },
+    ]
+  }
 }
+
+export default class DynamicDoughnut extends React.Component{
+  
+  componentDidMount(): void {
+		setInterval(() => {
+      this.setState(updateState());
+		}, 3000);
+  }
+
+  render() {
+    return (
+      <div style={{height:"30rem"}}>
+        <h2>Prices history</h2>
+        {
+          this.state && (
+            <Line
+              data={this.state as any}
+              options={{
+                plugins: {
+                  legend: { position: 'top' as const },
+                },
+              }}
+              width={250}
+              height={100}
+            />
+          )
+        }
+        
+      </div>
+    );
+  }
+};
