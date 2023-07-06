@@ -4,3 +4,4 @@ Starbucks-stock-backend/node_modules/
 data
 logs
 */**/.next
+Apache-Kafka-Project/target/

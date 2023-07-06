@@ -1,7 +1,0 @@
-/app/Apache-Kafka-Project/src/main/java/kafka/CoffeeStockConsumer.java
-/app/Apache-Kafka-Project/src/main/java/kafka/PurchasesHistoryConsumer.java
-/app/Apache-Kafka-Project/src/main/java/App.java
-/app/Apache-Kafka-Project/src/main/java/kafka/InterfaceConsumer.java
-/app/Apache-Kafka-Project/src/main/java/kafka/MergeCoffeePriceConsumer.java
-/app/Apache-Kafka-Project/src/main/java/kafka/CoffeeStockProducer.java
-/app/Apache-Kafka-Project/src/main/java/kafka/classes/Purchases.java

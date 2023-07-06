@@ -72,7 +72,6 @@ public class InterfaceConsumer {
         purchaseStringStream
             .to(purchaseTopic, Produced.with(Serdes.String(), Serdes.String()));
 
-
         // Mapping amount of purchases accoding to threshold and converting count to String
         KStream<String, String> groupedStream = grouped
             .toStream()
@@ -81,6 +80,7 @@ public class InterfaceConsumer {
                 if (value%threshold==0) return value.toString();
                 else return "null";
             });
+            
         // Joining streams of ammounts and streams with prices 
         KStream<String, String> joinedStream = groupedStream.leftJoin(
             textLines,
@@ -95,6 +95,9 @@ public class InterfaceConsumer {
             JoinWindows.of(Duration.ofSeconds(1)),
             StreamJoined.with(Serdes.String(), Serdes.String(), Serdes.String())
             );
+        
+        
+            
         // Output of prices to the destination topic (which will be merged in the futures)
         joinedStream
             .filter((key, value) -> { if (value!=null) return !value.contains("null"); else return false;})
@@ -102,13 +105,13 @@ public class InterfaceConsumer {
             .peek((key, value) -> System.out.println("[OUTPUT] KEY:" + key +" VALUE: "+ value))
             .to(destinationTopic, Produced.with(Serdes.String(), Serdes.String()));
 
+            
         // Final configuration            
         KafkaStreams streams = new KafkaStreams(builder.build(), config);
         streams.setUncaughtExceptionHandler(ex -> {
             System.out.println("Kafka-Streams 1 uncaught exception occurred. Stream will be replaced with new thread"+ ex);
             return StreamsUncaughtExceptionHandler.StreamThreadExceptionResponse.REPLACE_THREAD;
         });
-        
         
         streams.start();
     }
