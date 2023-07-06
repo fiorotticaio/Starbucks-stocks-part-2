@@ -1,4 +1,6 @@
+kafka/PurchasesHistoryConsumer.class
 kafka/MergeCoffeePriceConsumer.class
+kafka/classes/Purchases.class
 kafka/CoffeeStockConsumer.class
 App.class
 kafka/InterfaceConsumer.class
