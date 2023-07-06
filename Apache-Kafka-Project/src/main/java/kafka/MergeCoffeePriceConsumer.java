@@ -50,6 +50,7 @@ public class MergeCoffeePriceConsumer {
       .peek((key, value) -> System.out.println("[WEB] KEY:" + key +" VALUE: "+ value));
 
 
+
     /* left join of the two streams */
     KStream<String, String> joinedStream = apiCoffeePriceStream.leftJoin(webCoffeePriceStream,
       (apiPrice, webPrice) -> {
@@ -74,7 +75,9 @@ public class MergeCoffeePriceConsumer {
     );
 
     /* Sending result stream to destination topic */
-    joinedStream.to(destinationTopic, Produced.with(Serdes.String(), Serdes.String()));
+    joinedStream
+    .peek((key, value) -> System.out.println("[MERGED] KEY:" + key +" VALUE: "+ value))
+    .to(destinationTopic, Produced.with(Serdes.String(), Serdes.String()));
 
       
     /* Creating kafka stream */

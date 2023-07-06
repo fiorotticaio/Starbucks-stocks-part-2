@@ -10,10 +10,11 @@ cd Apache-Kafka-Project
 nohup mvn compile -DskipTests > ../logs/Compilation.log &
 sleep 5
 nohup mvn exec:java -Dexec.mainClass='App' > ../logs/App.log &
-sleep 5
+sleep 10
 nohup mvn exec:java -Dexec.mainClass='kafka.CoffeeStockConsumer' > ../logs/CoffeeStockConsumer.log &
 nohup mvn exec:java -Dexec.mainClass='kafka.CoffeeStockProducer' > ../logs/CoffeeStockProducer.log &
 nohup mvn exec:java -Dexec.mainClass='kafka.InterfaceConsumer' > ../logs/InterfaceConsumer.log &
 nohup mvn exec:java -Dexec.mainClass='kafka.MergeCoffeePriceConsumer' > ../logs/MergeCoffeePriceConsumer.log &
+nohup mvn exec:java -Dexec.mainClass='kafka.PurchasesHistoryConsumer' > ../logs/PurchasesHistoryConsumer.log &
 
 sleep infinity
