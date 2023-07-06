@@ -1,5 +1,5 @@
+kafka/MergeCoffeePriceConsumer.class
 kafka/CoffeeStockConsumer.class
 App.class
 kafka/InterfaceConsumer.class
 kafka/CoffeeStockProducer.class
-kafka/MergeCoffeePriceConsumer.class

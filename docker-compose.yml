@@ -7,6 +7,7 @@ services:
     volumes:
       - ./Apache-Kafka-Project:/app/Apache-Kafka-Project
       - ./logs:/app/logs
+      - ./data:/app/data
     ports:
       - 9092:9092
     networks:

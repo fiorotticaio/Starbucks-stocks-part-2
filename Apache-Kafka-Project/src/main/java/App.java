@@ -33,6 +33,14 @@ public class App {
       NewTopic coffeeSales = new NewTopic("coffee_sales", 1, (short) 1);
       adminClient.createTopics(Collections.singleton(coffeeSales)).all().get();
 
+      // Create the 'purchase_history' topic
+      NewTopic purchaseHistory = new NewTopic("purchase_history", 1, (short) 1);
+      adminClient.createTopics(Collections.singleton(purchaseHistory)).all().get();
+
+      // Create the 'purchases_history_web' topic
+      NewTopic purchasesHistoryWeb = new NewTopic("purchases_history_web", 1, (short) 1);
+      adminClient.createTopics(Collections.singleton(purchasesHistoryWeb)).all().get();
+
       adminClient.close();
   }
 }

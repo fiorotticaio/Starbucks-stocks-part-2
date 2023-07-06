@@ -50,6 +50,7 @@ public class MergeCoffeePriceConsumer {
       .peek((key, value) -> System.out.println("[WEB] KEY:" + key +" VALUE: "+ value));
 
 
+
     // Duration joinWindowCooldown = Duration.ofSeconds(10);
     // Duration gracePeriod = Duration.ofHours(24);
 
@@ -77,7 +78,9 @@ public class MergeCoffeePriceConsumer {
     );
 
     /* Sending result stream to destination topic */
-    joinedStream.to(destinationTopic, Produced.with(Serdes.String(), Serdes.String()));
+    joinedStream
+    .peek((key, value) -> System.out.println("[MERGED] KEY:" + key +" VALUE: "+ value))
+    .to(destinationTopic, Produced.with(Serdes.String(), Serdes.String()));
 
       
     /* Creating kafka stream */
