@@ -105,10 +105,10 @@ export default function Home() {
                 <td>REAL STOCK API PRICE</td>
                 <td>{api_coffee_price?api_coffee_price.toFixed(2):0}</td>
               </tr>
-              <tr>
+              {/* <tr>
                 <td>USER INTERFACE PRICE</td>
                 <td>{web_coffee_price?web_coffee_price.toFixed(2):0}</td>
-              </tr>
+              </tr> */}
               <tr>
                 <td>MERGED PRICE</td>
                 <td>{coffee_price?coffee_price.toFixed(2):0}</td>

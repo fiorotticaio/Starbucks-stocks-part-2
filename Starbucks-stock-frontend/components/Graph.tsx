@@ -33,7 +33,7 @@ const updateState = () => {
     datasets: [
       { label: 'MERGED Price', data: dataMER, borderColor: "#3ee7a1" },
       { label: 'API Price', data: dataAPI, borderColor: "#007042" },
-      { label: 'WEB Price', data: dataWEB, borderColor: "#04462b" },
+      // { label: 'WEB Price', data: dataWEB, borderColor: "#04462b" },
     ]
   }
 }
